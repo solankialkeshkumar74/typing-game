@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Alpha Typing Game</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+.container {
+    max-width: 700px;
+    margin: auto;
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 10px;
+}
+textarea {
+    width: 100%;
+    height: 80px;
+    font-size: 18px;
+    padding: 10px;
+}
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.startBtn { background: #a855f7; }
+.submitBtn { background: #22c55e; }
+#nextBtn { background: #38bdf8; display: none; }
+#retryBtn { background: #ef4444; display: none; }
+
+#timer {
+    font-size: 20px;
+    color: #facc15;
+}
+.hidden {
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>⌨️ Alpha Typing Game</h1>
+
+    <!-- START SCREEN -->
+    <div id="startScreen">
+        <p>Press Start to Play</p>
+        <button class="startBtn" onclick="startGame()">▶ Start Game</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="gameScreen" class="hidden">
+        <h2 id="level">Level 1</h2>
+        <p id="timer">Time: 10s</p>
+
+        <p id="sentence"></p>
+
+        <textarea id="input" placeholder="Type here..."></textarea><br><br>
+
+        <button class="submitBtn" onclick="check()">Submit</button>
+        <button id="nextBtn" onclick="nextLevel()">Next Level ▶</button>
+        <button id="retryBtn" onclick="retryLevel()">Retry 🔁</button>
+
+        <p id="result"></p>
+    </div>
+</div>
+
+<script>
+// 🔹 LEVEL DATA
+const levels = [
+    { text: "mahakal lover jigar 1727", time: 10 },
+    { text: "parashu love tu priyanshi", time: 9 }
+];
+
+// 🔹 AUTO GENERATE UP TO 100 LEVELS
+while (levels.length < 100) {
+    levels.push({
+        text: "Level " + (levels.length + 1) + " typing challenge sentence",
+        time: Math.max(5, 10 - levels.length)
+    });
+}
+
+let level = 0;
+let timeLeft;
+let timer;
+
+const sentenceEl = document.getElementById("sentence");
+const inputEl = document.getElementById("input");
+const timerEl = document.getElementById("timer");
+const resultEl = document.getElementById("result");
+const nextBtn = document.getElementById("nextBtn");
+const retryBtn = document.getElementById("retryBtn");
+
+function startGame() {
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("gameScreen").classList.remove("hidden");
+    loadLevel();
+}
+
+function loadLevel() {
+    sentenceEl.innerText = levels[level].text;
+    document.getElementById("level").innerText = "Level " + (level + 1);
+    timeLeft = levels[level].time;
+    timerEl.innerText = "Time: " + timeLeft + "s";
+    inputEl.value = "";
+    inputEl.disabled = false;
+    resultEl.innerText = "";
+    nextBtn.style.display = "none";
+    retryBtn.style.display = "none";
+    inputEl.focus();
+
+    clearInterval(timer);
+    timer = setInterval(() => {
+        timeLeft--;
+        timerEl.innerText = "Time: " + timeLeft + "s";
+
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            inputEl.disabled = true;
+            resultEl.innerText = "⏰ Time Over!";
+            retryBtn.style.display = "inline-block";
+        }
+    }, 1000);
+}
+
+function check() {
+    if (inputEl.value.trim() === levels[level].text) {
+        clearInterval(timer);
+        resultEl.innerText = "✅ Correct!";
+        nextBtn.style.display = "inline-block";
+        inputEl.disabled = true;
+    } else {
+        resultEl.innerText = "❌ Wrong Text!";
+        retryBtn.style.display = "inline-block";
+    }
+}
+
+function retryLevel() {
+    loadLevel();
+}
+
+function nextLevel() {
+    level++;
+    if (level < levels.length) {
+        loadLevel();
+    } else {
+        alert("🎉 Game Completed!");
+    }
+}
+</script>
+
+</body>
+</html>
